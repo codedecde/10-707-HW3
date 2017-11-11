@@ -34,7 +34,7 @@ class EmbeddingLayer(object):
         """
         The backward pass
             :param out: batch x T x hidden_dim: The output gradient
-            :return grad: batch x T
+            :return None: The inputs are discrete; cannot take gradient
         """
         np.add.at(self.params["W"].grad, self.inp, out)
         self.params["W"].grad /= out.shape[0]
