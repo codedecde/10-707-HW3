@@ -133,7 +133,7 @@ for epoch in xrange(N_EPOCHS):
             if best_val is None or best_val > val_ppx:
                 patience_count = 0
                 best_val = val_ppx
-                model_dir = "models_{}/".format(ACTIVATION)
+                model_dir = BASE_DIR + "models_{}/".format(ACTIVATION)
                 make_directory(model_dir)
                 model_file = model_dir + "model_hidden_%d_epoch_%d_ppx_%.2f.model" % (NUM_HIDDEN, epoch + 1, val_ppx)
                 params = lm
@@ -146,4 +146,4 @@ for epoch in xrange(N_EPOCHS):
             s.add_history(history)
             bar.update(step + 1, values=[("train_loss", l), ("val_ppx", val_ppx), ("lr", optimizer.lr)])
 # ======== End of Training Loop ===========#
-s.save("Summary/summary_activation_{}_Hidden_{}_valppx_{}.pkl".format(ACTIVATION, NUM_HIDDEN, best_val))
+s.save(BASE_DIR + "Summary/summary_activation_{}_Hidden_{}_valppx_{}.pkl".format(ACTIVATION, NUM_HIDDEN, best_val))

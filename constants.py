@@ -1,7 +1,8 @@
-TRAIN_FILE = "data/train.txt"
-VAL_FILE = "data/val.txt"
+BASE_DIR = "./"
+TRAIN_FILE = BASE_DIR + "data/train.txt"
+VAL_FILE = BASE_DIR + "data/val.txt"
 VOCAB_SIZE = 8000
-VOCAB_FILE = "data/vocab.pkl"
+VOCAB_FILE = BASE_DIR + "data/vocab.pkl"
 START_TOK = "<START>"
 END_TOK = "<END>"
 UNK_TOK = "<UNK>"
