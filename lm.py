@@ -11,6 +11,7 @@ import pdb
 from utils import Progbar, make_directory
 import numpy as np
 from LanguageModel import LanguageModel
+import argparse
 
 
 # ========== Load the Vocab ==============#
@@ -67,14 +68,28 @@ def perplexity(idx_for_ppx, model):
     return 2 ** (-ppx / len(idx_for_ppx))
 
 
-# ========== Define Constants ============#
-NUM_EMBED = 16
-NUM_HIDDEN = 128
-ACTIVATION = "linear"
-N_EPOCHS = 100
-BATCH_SIZE = 128
-LR = 0.1
-PATIENCE = 5
+# ========== Argument Parser ============#
+def parse_args():
+    parser = argparse.ArgumentParser(description="Language Model")
+    parser.add_argument("-ne", "--embed_size", help="Embedding Size", dest="n_embed", default=16, type=int)
+    parser.add_argument("-nd", "--hidden_size", help="Hidden Size", dest="n_dim", default=128, type=int)
+    parser.add_argument("-a", "--activation", help="Activation", dest="activation", default="linear", type=str)
+    parser.add_argument("-epochs", "--num_epochs", help="Number of epochs", dest="n_epochs", default=100, type=int)
+    parser.add_argument("-b", "--batch_size", help="Batch Size", dest="batch", default=128, type=int)
+    parser.add_argument("-lr", "--learning_rate", help="Learning Rate", dest="lr", default=0.1, type=float)
+    parser.add_argument("-p", "--patience", help="Patience", dest="patience", default=2, type=int)
+    args = parser.parse_args()
+    return args
+
+
+args = parse_args()
+NUM_EMBED = args.n_embed
+NUM_HIDDEN = args.n_dim
+ACTIVATION = args.activation
+N_EPOCHS = args.n_epochs
+BATCH_SIZE = args.batch
+LR = args.lr
+PATIENCE = args.patience
 # ========== Initialize Summary ==========#
 meta = {"NUM_EMBED": NUM_EMBED,
         "NUM_HIDDEN": NUM_HIDDEN,
@@ -110,7 +125,6 @@ for epoch in xrange(N_EPOCHS):
         if step != steps - 1:
             bar.update(step + 1, values=[("train_loss", l)])
         else:
-            # Doing validation stuff
             val_ppx = perplexity(idx_for_ppx, lm)
             tl /= steps
             metrics = {"train_loss": tl, "val_ppx": val_ppx}
@@ -132,4 +146,4 @@ for epoch in xrange(N_EPOCHS):
             s.add_history(history)
             bar.update(step + 1, values=[("train_loss", l), ("val_ppx", val_ppx), ("lr", optimizer.lr)])
 # ======== End of Training Loop ===========#
-s.save("Summary/summary_activation_{}_Hidden_{}.pkl".format(ACTIVATION, NUM_HIDDEN))
+s.save("Summary/summary_activation_{}_Hidden_{}_valppx_{}.pkl".format(ACTIVATION, NUM_HIDDEN, best_val))
