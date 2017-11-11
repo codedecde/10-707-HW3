@@ -97,6 +97,8 @@ meta = {"NUM_EMBED": NUM_EMBED,
         "N_EPOCHS": N_EPOCHS,
         "BATCH_SIZE": BATCH_SIZE,
         "LR": LR}
+for elem in meta:
+    print "{}:\t{}".format(elem, meta[elem])
 s = Summary(meta)
 best_val = None
 # ========== Training Loop ===============#

@@ -29,7 +29,7 @@ class History(object):
         self.metrics = metrics
         best = True
         if weights_file is not None:
-            directory = weights_file.split('/')[0]
+            directory = '/'.join(weights_file.split('/')[:-1])
             for file in os.listdir(directory):
                 ppx = float(file.split("_")[-1].strip(".model"))
                 if ppx > metrics['val_ppx']:
