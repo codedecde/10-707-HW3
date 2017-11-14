@@ -25,4 +25,4 @@ class SGD(object):
     def zero_grad(self):
         for name in self.params:
             for param in self.params[name]:
-                self.params[name][param].grad = np.zeros(self.params[name][param].data.shape)
+                self.params[name][param].grad = np.zeros(self.params[name][param].data.shape).astype(self.params[name][param].grad.dtype)

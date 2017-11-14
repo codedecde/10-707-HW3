@@ -5,8 +5,8 @@ import pdb
 
 class Variable(object):
     def __init__(self, array, requires_grad=True):
-        self.data = array
-        self.grad = np.zeros(array.shape)
+        self.data = array.astype(np.float32)
+        self.grad = np.zeros(array.shape).astype(np.float32)
         self.requires_grad = requires_grad
 
     def __str__(self):
