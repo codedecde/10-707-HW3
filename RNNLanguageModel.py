@@ -4,6 +4,8 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import pdb
 
+use_cuda = torch.cuda.is_available()
+
 
 class RNNLanguageModel(nn.Module):
     def __init__(self, vocab_size, n_embed, n_hidden, activation='tanh'):
@@ -14,9 +16,13 @@ class RNNLanguageModel(nn.Module):
         self.embedding_layer = nn.Embedding(vocab_size, n_embed)
         self.rnn = nn.RNN(n_embed, n_hidden, nonlinearity='tanh', num_layers=1)
         self.output = nn.Linear(n_hidden, vocab_size)
+        
 
     def init_hidden(self, batch):
-        return Variable(torch.zeros((1, batch, self.n_hidden)))
+        h = Variable(torch.zeros((1, batch, self.n_hidden)))
+        if use_cuda:
+            h = h.cuda()
+        return h
 
     def forward(self, inp, truncate=None):
         """The forward pass

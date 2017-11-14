@@ -148,4 +148,6 @@ for epoch in xrange(N_EPOCHS):
             s.add_history(history)
             bar.update(step + 1, values=[("train_loss", tl), ("val_ppx", val_ppx), ("lr", optimizer.lr)])
 # ======== End of Training Loop ===========#
-s.save(BASE_DIR + "Summary/summary_activation_{}_Hidden_{}_valppx_{}.pkl".format(ACTIVATION, NUM_HIDDEN, best_val))
+summary_dir = BASE_DIR + "Summary_NGRAM/"
+make_directory(summary_dir)
+s.save(summary_dir + "summary_activation_{}_Hidden_{}_valppx_{}.pkl".format(ACTIVATION, NUM_HIDDEN, best_val))

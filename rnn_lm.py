@@ -81,7 +81,7 @@ def parse_args():
     parser.add_argument("-ne", "--embed_size", help="Embedding Size", dest="n_embed", default=16, type=int)
     parser.add_argument("-nd", "--hidden_size", help="Hidden Size", dest="n_dim", default=128, type=int)
     parser.add_argument("-epochs", "--num_epochs", help="Number of epochs", dest="n_epochs", default=100, type=int)
-    parser.add_argument("-b", "--batch_size", help="Batch Size", dest="batch", default=128, type=int)
+    parser.add_argument("-b", "--batch_size", help="Batch Size", dest="batch", default=16, type=int)
     parser.add_argument("-lr", "--learning_rate", help="Learning Rate", dest="lr", default=0.1, type=float)
     parser.add_argument("-p", "--patience", help="Patience", dest="patience", default=2, type=int)
     parser.add_argument("-t", "--truncate", help="Truncate BPTT", dest="truncate", type=int)
@@ -122,6 +122,7 @@ loss = nn.NLLLoss()
 optimizer = optim.SGD(lm.parameters(), lr=LR, momentum=0.9)
 patience_count = 0
 lr = LR
+trunk = TRUNCATE if TRUNCATE is not None else 0
 for epoch in xrange(N_EPOCHS):
     print "\nEPOCH ({}/{})".format(epoch + 1, N_EPOCHS)
     steps = -(-len(indexed_training_data) // BATCH_SIZE)  # Round up
@@ -155,7 +156,6 @@ for epoch in xrange(N_EPOCHS):
                 best_val = val_ppx
                 model_dir = BASE_DIR + "models_RNN/"
                 make_directory(model_dir)
-                trunk = TRUNCATE if TRUNCATE is not None else 0
                 model_file = model_dir + "model_truncated_%d_embed_%d_hidden_%d_epoch_%d_ppx_%.2f.model" % (trunk, NUM_EMBED, NUM_HIDDEN, epoch + 1, val_ppx)
                 params = lm
             else:
@@ -164,9 +164,11 @@ for epoch in xrange(N_EPOCHS):
                     patience_count = 0
                     lr /= 2
                     for param_group in optimizer.param_groups:
-                        param_groups['lr'] = lr
+                        param_group['lr'] = lr
             history = History(epoch + 1, metrics, params, model_file)
             s.add_history(history, pytorch=True)
             bar.update(step + 1, values=[("train_loss", tl), ("val_ppx", val_ppx), ("lr", lr)])
 # ======== End of Training Loop ===========#
-s.save(BASE_DIR + "Summary/summary_activation_{}_Hidden_{}_valppx_{}.pkl".format(ACTIVATION, NUM_HIDDEN, best_val))
+summary_dir = BASE_DIR + "Summary_RNN/"
+make_directory(summary_dir)
+s.save(summary_dir + "summary_truncated_{}_activation_{}_Hidden_{}_valppx_{}.pkl".format(trunk, ACTIVATION, NUM_HIDDEN, best_val))
