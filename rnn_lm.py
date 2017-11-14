@@ -122,6 +122,7 @@ loss = nn.NLLLoss()
 optimizer = optim.SGD(lm.parameters(), lr=LR, momentum=0.9)
 patience_count = 0
 lr = LR
+trunk = 0 if TRUNCATE is None else TRUNCATE
 for epoch in xrange(N_EPOCHS):
     print "\nEPOCH ({}/{})".format(epoch + 1, N_EPOCHS)
     steps = -(-len(indexed_training_data) // BATCH_SIZE)  # Round up
@@ -159,7 +160,7 @@ for epoch in xrange(N_EPOCHS):
                 best_val = val_ppx
                 model_dir = BASE_DIR + "models_RNN/"
                 make_directory(model_dir)
-                model_file = model_dir + "model_truncated_%d_embed_%d_hidden_%d_epoch_%d_ppx_%.2f.model" % (TRUNCATE, NUM_EMBED, NUM_HIDDEN, epoch + 1, val_ppx)
+                model_file = model_dir + "model_truncated_%d_embed_%d_hidden_%d_epoch_%d_ppx_%.2f.model" % (trunk, NUM_EMBED, NUM_HIDDEN, epoch + 1, val_ppx)
                 params = lm
             else:
                 patience_count += 1
@@ -174,4 +175,4 @@ for epoch in xrange(N_EPOCHS):
 # ======== End of Training Loop ===========#
 summary_dir = BASE_DIR + "Summary_RNN/"
 make_directory(summary_dir)
-s.save(summary_dir + "summary_truncated_{}_Hidden_{}_Embed_{}_valppx_{}.pkl".format(TRUNCATE, NUM_HIDDEN, NUM_EMBED, best_val))
+s.save(summary_dir + "summary_truncated_{}_Hidden_{}_Embed_{}_valppx_{}.pkl".format(trunk, NUM_HIDDEN, NUM_EMBED, best_val))
