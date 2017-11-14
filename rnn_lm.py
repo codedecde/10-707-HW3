@@ -174,4 +174,4 @@ for epoch in xrange(N_EPOCHS):
 # ======== End of Training Loop ===========#
 summary_dir = BASE_DIR + "Summary_RNN/"
 make_directory(summary_dir)
-s.save(summary_dir + "summary_truncated_{}_activation_{}_Hidden_{}_valppx_{}.pkl".format(TRUNCATE, ACTIVATION, NUM_HIDDEN, best_val))
+s.save(summary_dir + "summary_truncated_{}_Hidden_{}_valppx_{}.pkl".format(TRUNCATE, NUM_HIDDEN, best_val))
