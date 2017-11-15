@@ -17,10 +17,12 @@ class categorical_cross_entropy(Loss):
     def __init__(self):
         super(categorical_cross_entropy, self).__init__()
 
-    def __call__(self, y, output):
+    def __call__(self, y, output, normalize=True):
         output += self.eps
         batch_size = output.shape[0]
-        loss = (-1 * np.log(output))[range(batch_size), y].sum() / batch_size
+        loss = (-1 * np.log(output))[range(batch_size), y].sum()
+        if normalize:
+            loss /= batch_size
         output[range(batch_size), y] -= 1.
         _grad = output
         return loss, _grad

@@ -22,50 +22,32 @@ vocab = cp.load(open(VOCAB_FILE))
 def index_data(data, vocab):
     ret_data = []
     for ix in xrange(len(data)):
-        data[ix] = data[ix].split(' ')
-        data[ix] = [START_TOK] + data[ix] + [END_TOK]
-        for jx in xrange(len(data[ix]) - N_GRAM):
-            ngram = [vocab[w] if w in vocab else vocab["<UNK>"] for w in data[ix][jx: jx + N_GRAM]]
-            pred = vocab[data[ix][jx + N_GRAM]] if data[ix][jx + N_GRAM] in vocab else vocab["<UNK>"]
+        d = data[ix].split(' ')
+        d = [START_TOK] + d + [END_TOK]
+        for jx in xrange(len(d) - N_GRAM):
+            ngram = [vocab[w] if w in vocab else vocab["<UNK>"] for w in d[jx: jx + N_GRAM]]
+            pred = vocab[d[jx + N_GRAM]] if d[jx + N_GRAM] in vocab else vocab["<UNK>"]
             ret_data.append((ngram, pred))
     return ret_data
 
 
 # ========== Computing Perplexity ========#
-def index_for_perplexity(data, vocab):
-    """
-    This indexes for perplexity. The difference is it returns a list of batch objects, one for each sentence
-        :param data: [text]: data
-        :param vocab: word -> ix
-        :return out: the batched data, one for each sentence
-    """
-    out = []
-    for ix in xrange(len(data)):
-        data[ix] = [START_TOK] + data[ix].split(' ') + [END_TOK]
-        batch = []
-        for jx in xrange(0, len(data[ix]) - N_GRAM):
-            ngram = [vocab[w] if w in vocab else vocab["<UNK>"] for w in data[ix][jx: jx + N_GRAM]]
-            pred = vocab[data[ix][jx + N_GRAM]] if data[ix][jx + N_GRAM] in vocab else vocab["<UNK>"]
-            batch.append((ngram, pred))
-        out.append(batch)
-    return out
-
-
-def perplexity(idx_for_ppx, model):
+def perplexity(index, model):
     """
     Compute the perplexity of the validation data
-        :param idx_for_ppx: Indexed data for perplexity computation
+        :param index: Indexed data
         :param model: The model to evaluate
         :return ppx: The perplexity
     """
+    batch = 512
     ppx = 0.
-    for ix in xrange(len(idx_for_ppx)):
-        batch = idx_for_ppx[ix]
-        batch_x, batch_y = map(lambda x: np.array(x), zip(*batch))
+    M = len(index)
+    for ix in xrange(0, len(index), batch):
+        batch_x, batch_y = map(lambda x: np.array(x), zip(*index[ix: ix + batch]))
         preds = model(batch_x)
         lp = np.log2(preds[range(preds.shape[0]), batch_y]).sum()
-        ppx += (lp / batch_y.shape[0])
-    return 2 ** (-ppx / len(idx_for_ppx))
+        ppx += lp
+    return 2 ** (-ppx / M)
 
 
 # ========== Argument Parser ============#
@@ -105,31 +87,40 @@ best_val = None
 lm = LanguageModel(len(vocab), NUM_EMBED, NUM_HIDDEN, ACTIVATION)
 training_data = map(lambda x: x.lower().strip(), open(TRAIN_FILE).readlines())
 val_data = map(lambda x: x.lower().strip(), open(VAL_FILE).readlines())
-indexed_training_data = index_data(training_data, vocab)
-idx_for_ppx = index_for_perplexity(val_data, vocab)
+ix_train = index_data(training_data, vocab)
+ix_val = index_data(val_data, vocab)
+ix_val_x, ix_val_y = map(lambda x: np.array(x), zip(*ix_val))
 loss = categorical_cross_entropy()
 optimizer = SGD(lm.parameters(), lr=LR, momentum=0.9)
 patience_count = 0
 for epoch in xrange(N_EPOCHS):
     print "\nEPOCH ({}/{})".format(epoch + 1, N_EPOCHS)
-    steps = -(-len(indexed_training_data) // BATCH_SIZE)  # Round up
+    steps = -(-len(ix_train) // BATCH_SIZE)  # Round up
     bar = Progbar(steps)
     tl = 0.
-    for step, ix in enumerate(xrange(0, len(indexed_training_data), BATCH_SIZE)):
-        batch_x, batch_y = map(lambda x: np.array(x), zip(*indexed_training_data[ix: ix + BATCH_SIZE]))
+    tppx = 0.
+    for step, ix in enumerate(xrange(0, len(ix_train), BATCH_SIZE)):
+        batch_x, batch_y = map(lambda x: np.array(x), zip(*ix_train[ix: ix + BATCH_SIZE]))
         batch_x = np.array(batch_x)
         preds = lm(batch_x)
         l, g = loss(batch_y, preds)
-        tl += l
         lm.backward(g)
         optimizer.step()
         optimizer.zero_grad()
+        tl += l
+        ppx = perplexity(ix_train[ix: ix + BATCH_SIZE], lm)
+        tppx += ppx
         if step != steps - 1:
-            bar.update(step + 1, values=[("train_loss", l)])
+            bar.update(step + 1, values=[("train_loss", l), ("train_ppx", ppx)])
         else:
-            val_ppx = perplexity(idx_for_ppx, lm)
+            val_ppx = perplexity(ix_val, lm)
+            val_loss = 0.
+            for jx in xrange(0, len(ix_val_x), BATCH_SIZE):
+                val_loss += loss(ix_val_y[jx: jx + BATCH_SIZE], lm(ix_val_x[jx: jx + BATCH_SIZE]), normalize=False)[0]
+            val_loss /= len(ix_val_x)
             tl /= steps
-            metrics = {"train_loss": tl, "val_ppx": val_ppx}
+            tppx /= steps
+            metrics = {"train_loss": tl, "train_ppx": tppx, "val_loss": val_loss, "val_ppx": val_ppx}
             params = None
             model_file = None
             if best_val is None or best_val > val_ppx:
@@ -146,7 +137,7 @@ for epoch in xrange(N_EPOCHS):
                     optimizer.lr /= 2
             history = History(epoch + 1, metrics, params, model_file)
             s.add_history(history)
-            bar.update(step + 1, values=[("train_loss", tl), ("val_ppx", val_ppx), ("lr", optimizer.lr)])
+            bar.update(step + 1, values=metrics.items() + [('lr', optimizer.lr)])
 # ======== End of Training Loop ===========#
 summary_dir = BASE_DIR + "Summary_NGRAM/"
 make_directory(summary_dir)
