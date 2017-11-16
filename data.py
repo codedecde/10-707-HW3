@@ -20,14 +20,15 @@ word2ix = {START_TOK: 0, END_TOK: 1, UNK_TOK: 2}
 for w in top_k_words:
     word2ix[w] = len(word2ix)
 # Save the vocab
-cp.dump(word2ix, open(VOCAB_FILE, "wb"))
+# cp.dump(word2ix, open(VOCAB_FILE, "wb"))
 # ================ 4 gram histogram ==============#
 # TODO: Plot the histogram
 four_gram_count = {}
 with open(TRAIN_FILE) as tf:
     for line in tf:
         line = line.lower().strip().split(' ')
-        for ix in xrange(len(line) - 4):
+        line = [START_TOK] + line + [END_TOK]
+        for ix in xrange(len(line) - 4 + 1):
             four_gram = line[ix: ix + 4]
             four_gram = ' '.join([x if x in word2ix else "<UNK>" for x in four_gram])
             four_gram_count[four_gram] = dict.setdefault(four_gram_count, four_gram, 0) + 1

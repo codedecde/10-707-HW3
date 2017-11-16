@@ -24,7 +24,7 @@ def index_data(data, vocab):
     for ix in xrange(len(data)):
         d = data[ix].split(' ')
         d = [START_TOK] + d + [END_TOK]
-        for jx in xrange(len(d) - N_GRAM):
+        for jx in xrange(len(d) - N_GRAM + 1):
             ngram = [vocab[w] if w in vocab else vocab["<UNK>"] for w in d[jx: jx + N_GRAM]]
             pred = vocab[d[jx + N_GRAM]] if d[jx + N_GRAM] in vocab else vocab["<UNK>"]
             ret_data.append((ngram, pred))

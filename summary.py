@@ -1,7 +1,12 @@
 import cPickle as cp
 import torch
+from collections import OrderedDict
+import numpy as np
+import matplotlib
 import os
 import pdb
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 class Summary(object):
@@ -47,3 +52,35 @@ class History(object):
         self.metrics = metrics
         self.weights_file = weights_file
         self.params = params
+
+
+def compare_summaries(summaries, headers, save_file, ylabel):
+    """
+    Compares the summaries to each other based on headers
+        :param summaries: [(name, summary)]
+        :param headers: [string]: The headers to compare
+        :param save_file: string: Where to save the image
+        :param ylabel: string: The y axis label
+    """
+    names, summaries = map(list, zip(*summaries))
+    plot_dict = OrderedDict()
+    for name in names:
+        for header in headers:
+            key = "{}: {}".format(name, header)
+            plot_dict[key] = []
+    for ix in xrange(len(summaries)):
+        name = names[ix]
+        for hist in summaries[ix]['history']:
+            for header in headers:
+                key = "{}: {}".format(name, header)
+                plot_dict[key].append(hist.metrics[header])
+    epochs = range(1, summaries[0]['history'][-1].epoch + 1)
+    plt.xlabel('Epochs')
+    plt.ylabel(ylabel)
+    plt_objects = OrderedDict()
+    for key in plot_dict:
+        plt_objects[key], = plt.plot(epochs, np.array(plot_dict[key]), label=key)
+    plt.legend(plt_objects.values(), plt_objects.keys(), loc=0)
+    plt.savefig(save_file)
+    plt.close()
+    return plot_dict
