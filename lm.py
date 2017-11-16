@@ -24,7 +24,7 @@ def index_data(data, vocab):
     for ix in xrange(len(data)):
         d = data[ix].split(' ')
         d = [START_TOK] + d + [END_TOK]
-        for jx in xrange(len(d) - N_GRAM + 1):
+        for jx in xrange(len(d) - N_GRAM):
             ngram = [vocab[w] if w in vocab else vocab["<UNK>"] for w in d[jx: jx + N_GRAM]]
             pred = vocab[d[jx + N_GRAM]] if d[jx + N_GRAM] in vocab else vocab["<UNK>"]
             ret_data.append((ngram, pred))
@@ -57,7 +57,7 @@ def parse_args():
     parser.add_argument("-nd", "--hidden_size", help="Hidden Size", dest="n_dim", default=128, type=int)
     parser.add_argument("-a", "--activation", help="Activation", dest="activation", default="linear", type=str)
     parser.add_argument("-epochs", "--num_epochs", help="Number of epochs", dest="n_epochs", default=100, type=int)
-    parser.add_argument("-b", "--batch_size", help="Batch Size", dest="batch", default=128, type=int)
+    parser.add_argument("-b", "--batch_size", help="Batch Size", dest="batch", default=512, type=int)
     parser.add_argument("-lr", "--learning_rate", help="Learning Rate", dest="lr", default=0.1, type=float)
     parser.add_argument("-p", "--patience", help="Patience", dest="patience", default=2, type=int)
     args = parser.parse_args()
