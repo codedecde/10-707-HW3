@@ -8,8 +8,11 @@ from copy import deepcopy
 import heapq as h
 import pdb
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
-model_dir = "models_linear/"
+model_dir = "models_tanh/"
 best_val = None
 best_file = None
 for file in os.listdir(model_dir):
@@ -67,3 +70,25 @@ def find_nearest_k(word, vocab, model, k=5):
                 h.heappop(top_k)
                 h.heappush(top_k, (dist, ix2vocab[ix]))
     return top_k
+
+def visualize_embeddings(matrix, vocab, file, num_words=50):
+    """
+    Generate the scatterplot for the matrix
+    """
+    ix2vocab = {vocab[w]: w for w in vocab}
+    indices = np.random.choice(range(matrix.shape[0]), replace=False, size=num_words)
+    small_matrix = matrix[indices]
+    labels = [ix2vocab[index] for index in indices]
+    
+    plt.scatter(small_matrix[:,0], small_matrix[:, 1])
+    for i, txt in enumerate(labels):
+        plt.annotate(txt, (small_matrix[i, 0], small_matrix[i, 1]), xytext=(3, 3),
+                     textcoords="offset points", ha='left', va='top')
+    plt.savefig(file)
+    plt.close()
+    '''
+    plt.annotate(word, xy = (xs[i], ys[i]), xytext = (3, 3),
+                     textcoords = 'offset points', ha = 'left', va = 'top')
+    '''
+
+    

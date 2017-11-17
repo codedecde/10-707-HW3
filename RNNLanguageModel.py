@@ -2,21 +2,24 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
+import numpy as np
 import pdb
 
 use_cuda = torch.cuda.is_available()
 
 
 class RNNLanguageModel(nn.Module):
-    def __init__(self, vocab_size, n_embed, n_hidden, activation='tanh'):
+    def __init__(self, vocab_size, n_embed, n_hidden, activation='tanh', ortho=False):
         super(RNNLanguageModel, self).__init__()
         self.n_embed = n_embed
         self.n_hidden = n_hidden
         self.vocab_size = vocab_size
         self.embedding_layer = nn.Embedding(vocab_size, n_embed)
         self.rnn = nn.RNN(n_embed, n_hidden, nonlinearity='tanh', num_layers=1)
+        if ortho:
+            u, s, v = np.linalg.svd(self.rnn._parameters['weight_hh_l0'].data.numpy())
+            self.rnn._parameters['weight_hh_l0'].data = torch.Tensor(u)
         self.output = nn.Linear(n_hidden, vocab_size)
-        
 
     def init_hidden(self, batch):
         h = Variable(torch.zeros((1, batch, self.n_hidden)))

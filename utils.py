@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 import os
 import pdb
 import time
@@ -7,6 +8,9 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
+
+def get_np_tensor(tensor):
+    return tensor.cpu().data.numpy() if torch.cuda.is_available() else tensor.data.numpy()
 
 
 def make_directory(dir_name):

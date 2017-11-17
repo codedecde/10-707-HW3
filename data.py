@@ -1,8 +1,11 @@
 from collections import Counter
+import numpy as np
 import cPickle as cp
 import pdb
 from constants import *
-
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 # ============ File specific constants =======================#
 HIST_FILE = "data/4gram_histogram.txt"
 NUM_HIST = 50
@@ -37,4 +40,12 @@ with open(HIST_FILE, "wb") as hf:
     for ix in xrange(NUM_HIST):
         write_buf = "{}\t{}\n".format(four_gram_count[ix][0], four_gram_count[ix][1])
         hf.write(write_buf)
+_, freq = map(list, zip(*four_gram_count))
+xaxis = range(1, len(freq) + 1)
+plt.xlabel('Four Grams')
+plt.ylabel('Frequency')
+plt.xlim(xmin=-1000, xmax=xaxis[-1] + 1)
+fig, = plt.plot(xaxis, np.array(freq), label="fourgram_freq")
+plt.savefig('Images_NGRAM/fourgram_histogram.png')
+plt.close()
 # =================================================#

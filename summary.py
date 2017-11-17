@@ -54,7 +54,7 @@ class History(object):
         self.params = params
 
 
-def compare_summaries(summaries, headers, save_file, ylabel):
+def plot_summaries(summaries, headers, save_file, ylabel):
     """
     Compares the summaries to each other based on headers
         :param summaries: [(name, summary)]
@@ -84,3 +84,21 @@ def compare_summaries(summaries, headers, save_file, ylabel):
     plt.savefig(save_file)
     plt.close()
     return plot_dict
+
+def generate_csv(summaries, filename):
+    """
+    Generates CSV given a list of summaries
+        :param summaries: [summary]: list of summary instances
+        :param filename: String: The filename
+    """
+    with open(filename, 'wb') as f:
+        header = ','.join(['ACTIVATION', 'HIDDEN SIZE', 'TRAIN LOSS', 'VAL LOSS', 'TRAIN PPX', 'VAL PPX']) + '\n'
+        f.write(header)
+        def extract_best(summary, metric):
+            return min([h.metrics[metric] for h in summary['history']])
+        for summary in summaries:
+            activation = summary['meta']['ACTIVATION']
+            h_size = summary['meta']['NUM_HIDDEN']
+            train_loss, val_loss, train_ppx, val_ppx = extract_best(summary, 'train_loss'), extract_best(summary, 'val_loss'), extract_best(summary, 'train_ppx'), extract_best(summary, 'val_ppx')
+            line = ",".join([activation] + map(lambda x: "%.2f" % (x), [h_size, train_loss, val_loss, train_ppx, val_ppx])) + '\n'
+            f.write(line)
