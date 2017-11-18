@@ -145,14 +145,13 @@ for epoch in xrange(N_EPOCHS):
             l_data = get_np_tensor(l)[0]
             bar.update(step + 1, values=[("train_loss", l_data)])
         else:
-            val_ppx = get_np_tensor(perplexity(ix_val, lm, BATCH_SIZE))
+            val_ppx = perplexity(ix_val, lm, BATCH_SIZE)
             val_loss = 0.
             for jx in xrange(0, len(ix_val_x), BATCH_SIZE):
                 val_loss += F.nll_loss(lm(ix_val_x[jx: jx + BATCH_SIZE]), ix_val_y[jx: jx + BATCH_SIZE], size_average=False)
             tl /= steps
             tl = get_np_tensor(tl)[0]
             tppx /= steps
-            tppx = get_np_tensor(tppx)[0]
             val_loss /= ix_val_x.size(0)
             val_loss = get_np_tensor(val_loss)[0]
             metrics = {"train_loss": tl, "train_ppx": tppx, "val_loss": val_loss, "val_ppx": val_ppx}
