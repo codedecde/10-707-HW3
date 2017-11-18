@@ -27,8 +27,8 @@ HW3 of the deep learning course: Language Models
     - lr: Learning Rate (default 0.1)
     - p: Patience (how many epochs to wait before halving lr if performance doesnt improve) (default 2)
 * Generates 
-    - models_<Activation>/model_embed_{embedding_size}_hidden_{hidden_size}_epoch_{epoch}_ppx_{perplexity}.model
-    - Summary_NGRAM/summary_activation_{ACTIVATION}_Hidden_{HIDDEN_SIZE}_valppx_{VAL_PPX}.pkl
+    - models_<Activation>/model_embed_EMBED_hidden_HIDDEN_epoch_EPOCH_ppx_PPX.model
+    - Summary_NGRAM/summary_activation_ACTIVATION_Hidden_HIDDEN_valppx_VALPPX.pkl
 
 
 
