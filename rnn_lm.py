@@ -177,4 +177,4 @@ for epoch in xrange(N_EPOCHS):
 # ======== End of Training Loop ===========#
 summary_dir = BASE_DIR + "Summary_RNN/"
 make_directory(summary_dir)
-s.save(summary_dir + "summary_ortho_%s_truncated_{}_Hidden_{}_Embed_{}_valppx_{}.pkl".format(str(ORTHO), trunk, NUM_HIDDEN, NUM_EMBED, best_val))
+s.save(summary_dir + "summary_ortho_{}_truncated_{}_Hidden_{}_Embed_{}_valppx_{}.pkl".format(str(ORTHO), trunk, NUM_HIDDEN, NUM_EMBED, best_val))
