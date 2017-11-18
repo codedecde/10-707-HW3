@@ -134,15 +134,15 @@ for epoch in xrange(N_EPOCHS):
             preds = lm(batch_x, TRUNCATE)
         else:
             preds = lm(batch_x, None)
-        l = loss(preds, batch_y)
-        l.backward()
+        l_batch = loss(preds, batch_y)
+        l_batch.backward()
         optimizer.step()
         optimizer.zero_grad()
-        tl += l
+        tl += l_batch
         ppx = perplexity(ix_train[ix: ix + BATCH_SIZE], lm, BATCH_SIZE)
         tppx += ppx
         if step != steps - 1:
-            l_data = get_np_tensor(l)[0]
+            l_data = get_np_tensor(l_batch)[0]
             bar.update(step + 1, values=[("train_loss", l_data)])
         else:
             val_ppx = perplexity(ix_val, lm, BATCH_SIZE)
