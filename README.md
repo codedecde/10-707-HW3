@@ -92,3 +92,6 @@ Finally, there are some other functions for the language model
 * generate_language : Generates sentences given a model, a vocab, and a seed
 * find_nearest_k: Finds the k nearest neighbors based on euclidien distance
 * visualize_embeddings: Scatterplot of the embedding matrix
+
+#### utils.py
+Utilities like ProgressBar, make_directory etc
