@@ -1,4 +1,4 @@
-from module import module
+from Module import module
 import Layers as L
 from constants import *
 

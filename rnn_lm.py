@@ -8,9 +8,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torch.autograd as autograd
 from constants import *
-from summary import Summary, History
+from Summary import Summary, History
 import pdb
 from utils import Progbar, make_directory, get_np_tensor
 from RNNLanguageModel import RNNLanguageModel

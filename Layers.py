@@ -1,5 +1,5 @@
 import numpy as np
-import activations
+import Activations as activations
 import pdb
 
 

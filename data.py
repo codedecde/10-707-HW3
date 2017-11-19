@@ -4,10 +4,12 @@ import cPickle as cp
 import pdb
 from constants import *
 import matplotlib
+from utils import make_directory
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 # ============ File specific constants =======================#
-HIST_FILE = "data/4gram_histogram.txt"
+HIST_FILE = "data/common_fourgrams.txt"
+IMAGE_DIR = "Images_NGRAM/"
 NUM_HIST = 50
 # ============== BUILD THE VOCAB ================#
 word_counter = Counter()
@@ -23,7 +25,7 @@ word2ix = {START_TOK: 0, END_TOK: 1, UNK_TOK: 2}
 for w in top_k_words:
     word2ix[w] = len(word2ix)
 # Save the vocab
-# cp.dump(word2ix, open(VOCAB_FILE, "wb"))
+cp.dump(word2ix, open(VOCAB_FILE, "wb"))
 # ================ 4 gram histogram ==============#
 # TODO: Plot the histogram
 four_gram_count = {}
@@ -46,6 +48,7 @@ plt.xlabel('Four Grams')
 plt.ylabel('Frequency')
 plt.xlim(xmin=-1000, xmax=xaxis[-1] + 1)
 fig, = plt.plot(xaxis, np.array(freq), label="fourgram_freq")
-plt.savefig('Images_NGRAM/fourgram_histogram.png')
+make_directory(IMAGE_DIR)
+plt.savefig(IMAGE_DIR + 'fourgram_frequency.png')
 plt.close()
 # =================================================#

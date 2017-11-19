@@ -3,10 +3,10 @@ The language model
 '''
 
 from Loss import categorical_cross_entropy
-from optimizer import SGD
+from Optimizer import SGD
 import cPickle as cp
 from constants import *
-from summary import Summary, History
+from Summary import Summary, History
 import pdb
 from utils import Progbar, make_directory
 import numpy as np
