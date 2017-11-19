@@ -46,7 +46,7 @@ HW3 of the deep learning course: Language Models
 * Truncated BPTT happens for 10% cases, when specified
 * Generates 
     - models_<Activation>/model_ortho_ORTHO_truncated_TRUNCATED_embed_EMBED_hidden_HIDDEN_epoch_EPOCH_ppx_PPX.model
-    - Summary_NGRAM/summary_ortho_ORTHO_truncated_TRUNCATED_Hidden_HIDDEN_Embed_EMBED_valppx_VALPPX.pkl (See auxillary files)
+    - Summary_RNN/summary_ortho_ORTHO_truncated_TRUNCATED_Hidden_HIDDEN_Embed_EMBED_valppx_VALPPX.pkl (See auxillary files)
 
 ### Auxillary Files
 #### LanguageModel.py
